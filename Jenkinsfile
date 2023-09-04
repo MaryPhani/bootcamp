@@ -7,12 +7,12 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         EKS_CLUSTER_NAME = 'sandboxeks1'
-        SONAR_LOGIN = credentials('Sonar-Creds')
+        SONAR_LOGIN = credentials('sonar_token')
     }
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/babu517/springboot-app-deployment-K8S']]])
+                checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/MaryPhani/bootcamp.git']]])
             }
         }
         stage('Code Build') {
@@ -23,9 +23,9 @@ pipeline {
         stage('Compile and Run Sonar Analysis') {
             steps {
                 sh "mvn clean verify sonar:sonar  \
-            -Dsonar.projectKey=frontend \
-            -Dsonar.host.url=http://182.18.184.76:9000/ \
-            -Dsonar.login=sqa_50885d4939be4dfc296b4d5af73a7c307287fec8"
+            -Dsonar.projectKey=BP-sonarqube \
+            -Dsonar.host.url=http://182.18.184.65:9000/ \
+            -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
             }
         }
         stage('Push to S3') {
@@ -42,9 +42,9 @@ pipeline {
             steps {
                 echo 'Snyk Testing...'
                 snykSecurity (
-                    projectName: 'babu517', 
+                    projectName: 'Snyk_security_tool', 
                     snykInstallation: 'snyk@latest', 
-                    snykTokenId: 'Snyk',
+                    snykTokenId: 'snyk_token',
                     failOnIssues: false
                 )
             }
