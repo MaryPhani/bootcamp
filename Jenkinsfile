@@ -37,7 +37,7 @@ pipeline {
                 sh 'aws s3 cp target/*.jar s3://eksfrontendapp/'
                 }
             }
-               
+              
         stage('Snyk Test') {
             steps {
                 echo 'Snyk Testing...'
