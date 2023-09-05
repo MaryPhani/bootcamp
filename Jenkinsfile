@@ -3,8 +3,8 @@ pipeline {
     environment {
         app = 'frontend'
         IMAGE_TAG = "frontend-${BUILD_NUMBER}"
-        AWS_ACCESS_KEY_ID = credentials('AWS-CRED')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
+        aws_access_key_id=ASIAXEICFCS2IYB2HIBL
+        aws_secret_access_key=IwfYZOglQCpaRafHqfsI8+YXdonJ0zBhlJsAKwL+
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         EKS_CLUSTER_NAME = 'sandboxeks1'
         SONAR_LOGIN = credentials('sonar_token')
