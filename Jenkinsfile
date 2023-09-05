@@ -30,8 +30,8 @@ pipeline {
         }
         stage('Push to S3') {
             steps {
-                sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
-                sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
+                sh 'aws configure set aws_access_key_id $aws_access_key_id'
+                sh 'aws configure set aws_secret_access_key $aws_secret_access_key'
                 sh 'aws configure set default.region $AWS_DEFAULT_REGION'
                 sh 'aws s3 ls'
                 sh 'aws s3 cp target/*.jar s3://eksfrontendapp/'
