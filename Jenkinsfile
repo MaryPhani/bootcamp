@@ -3,8 +3,8 @@ pipeline {
     environment {
         app = 'frontend'
         IMAGE_TAG = "frontend-${BUILD_NUMBER}"
-        aws_access_key_id ='ASIAXEICFCS2IYB2HIBL'
-        aws_secret_access_key = 'IwfYZOglQCpaRafHqfsI8+YXdonJ0zBhlJsAKwL+'
+        AWS_ACCESS_KEY_ID = credentials('AWS-CRED')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         EKS_CLUSTER_NAME = 'sandboxeks1'
         SONAR_LOGIN = credentials('sonar_token')
@@ -24,14 +24,14 @@ pipeline {
             steps {
                 sh "mvn clean verify sonar:sonar  \
             -Dsonar.projectKey=BP-sonarqube \
-            -Dsonar.host.url=http://182.18.184.73:9000/ \
+            -Dsonar.host.url=http://182.18.184.65:9000/ \
             -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
             }
         }
       /*  stage('Push to S3') {
             steps {
-                sh 'aws configure set $aws_access_key_id'
-                sh 'aws configure set $aws_secret_access_key'
+                sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
+                sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
                 sh 'aws configure set default.region $AWS_DEFAULT_REGION'
                 sh 'aws s3 ls'
                 sh 'aws s3 cp target/*.jar s3://eksfrontendapp/'
