@@ -28,7 +28,7 @@ pipeline {
             -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
             }
         }
-      /*  stage('Push to S3') {
+      stage('Push to S3') {
             steps {
                 sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
                 sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
@@ -36,7 +36,7 @@ pipeline {
                 sh 'aws s3 ls'
                 sh 'aws s3 cp target/*.jar s3://eksfrontendapp/'
                 }
-            }  */
+            } 
               
         stage('Snyk Test') {
             steps {
