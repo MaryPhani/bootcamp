@@ -15,12 +15,12 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github_cred', url: 'https://github.com/MaryPhani/bootcamp.git']]])
             }
         }
-        stage('Code Build') {
+       /* stage('Code Build') {
             steps {
                 sh 'mvn clean install'
             }
         }
-       /* stage('Compile and Run Sonar Analysis') {
+        stage('Compile and Run Sonar Analysis') {
             steps {
                 sh "mvn clean verify sonar:sonar  \
             -Dsonar.projectKey=BP-sonarqube \
