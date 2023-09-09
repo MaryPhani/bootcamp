@@ -7,7 +7,7 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         EKS_CLUSTER_NAME = 'sandboxeks1'
-        SONAR_LOGIN = credentials('sonar_token')
+        # SONAR_LOGIN = credentials('sonar_token')
     }
     stages {
         stage('Checkout') {
