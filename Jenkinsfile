@@ -20,14 +20,14 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
-        stage('Compile and Run Sonar Analysis') {
+       /* stage('Compile and Run Sonar Analysis') {
             steps {
                 sh "mvn clean verify sonar:sonar  \
             -Dsonar.projectKey=BP-sonarqube \
             -Dsonar.host.url=http://182.18.184.81:9000/ \
             -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
             }
-        }
+        } 
       stage('Push to S3') {
             steps {
                 sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
@@ -61,7 +61,7 @@ pipeline {
                 sh "docker tag frontendapp-${app}:latest  490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${BUILD_NUMBER}"
                 sh "docker push 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${BUILD_NUMBER}"
             }
-        }
+        } */
         stage('Deploying ECR Image to EKS') {
             steps {
                 script {
