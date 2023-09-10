@@ -66,7 +66,6 @@ pipeline {
                 script {
                     sh '''
                         aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
-                        kubectl version
                         kubectl apply -f eks-deploy-k8s.yaml
                         
                     '''
