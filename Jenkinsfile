@@ -2,7 +2,8 @@ pipeline {
     agent any
     environment {
         app = 'frontend'
-        IMAGE_TAG = "frontend-${BUILD_NUMBER}"
+        commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        IMAGE_TAG = "frontend-${commitId}"
         AWS_ACCESS_KEY_ID = credentials('AWS-CRED')
         AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
         AWS_DEFAULT_REGION = 'ap-southeast-1'
@@ -14,12 +15,12 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitcred', url: 'https://github.com/MaryPhani/bootcamp.git']]])
             }
         }
-       /* stage('Code Build') {
+        stage('Code Build') {
             steps {
                 sh 'mvn clean install'
             }
         }
-        stage('Compile and Run Sonar Analysis') {
+        /*stage('Compile and Run Sonar Analysis') {
             steps {
                 sh "mvn clean verify sonar:sonar  \
             -Dsonar.projectKey=BP-sonarqube \
@@ -47,7 +48,7 @@ pipeline {
                     failOnIssues: false
                 )
             }
-        }
+        } */
 
         stage('Build Image') {
             steps {
@@ -57,11 +58,11 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 sh 'aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com'
-                sh "docker tag frontendapp-${app}:latest  490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${BUILD_NUMBER}"
-                sh "docker push 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${BUILD_NUMBER}"
+                sh "docker tag frontendapp-${app}:latest  490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${commitId}"
+                sh "docker push 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${commitId}"
             }
-        } */
-        stage('Deploying ECR Image to EKS') {
+        } 
+        /*stage('Deploying ECR Image to EKS') {
             steps {
                 script {
                     sh '''
@@ -71,7 +72,7 @@ pipeline {
                     '''
                 }
             }
-        }
+        } */
         
     }
 }
