@@ -4,10 +4,10 @@ pipeline {
         app = 'frontend'
         commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         IMAGE_TAG = "frontend-${commitId}"
-        AWS_ACCESS_KEY_ID = credentials('AWS-CRED')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
+       // AWS_ACCESS_KEY_ID = credentials('AWS-CRED')
+       // AWS_SECRET_ACCESS_KEY = credentials('AWS-CRED')
         AWS_DEFAULT_REGION = 'ap-southeast-1'
-        EKS_CLUSTER_NAME = 'sandboxeks1'
+       // EKS_CLUSTER_NAME = 'sandboxeks1'
         }
     stages {
         stage('Checkout') {
