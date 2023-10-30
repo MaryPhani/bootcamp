@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    parameters {
+    choice(choices: ['main', 'test'], description: 'Select Branch to Build', name: 'BRANCH')
+    choice(choices: ['production', 'testing'], description: 'Select Environment', name: 'ENVIRONMENT')
+
     environment {
         app = 'frontend'
         commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
@@ -15,67 +20,65 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitcred', url: 'https://github.com/MaryPhani/bootcamp.git']]])
             }
         }
-        stage('Code Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-        /*stage('Compile and Run Sonar Analysis') {
-            steps {
-                sh "mvn clean verify sonar:sonar  \
-            -Dsonar.projectKey=BP-sonarqube \
-            -Dsonar.host.url=http://182.18.184.81:9000/ \
-            -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
-            }
-        } 
-      stage('Push to S3') {
-            steps {
-                sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
-                sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
-                sh 'aws configure set default.region $AWS_DEFAULT_REGION'
-                sh 'aws s3 ls'
-                sh 'aws s3 cp target/*.jar s3://eksfrontendapp/'
-                }
-            } 
-        stage('Snyk Test') {
-            steps {
-                echo 'Snyk Testing...'
-                snykSecurity (
-                    projectName: 'Snyk_security_tool', 
-                    snykInstallation: 'snyk@latest', 
-                    snykTokenId: 'snyk_token',
-                    failOnIssues: false
-                )
-            }
-        } */
-
-         stage('Build Image') {
-            steps {
-                sh 'docker build -t frontendapp-${app} .'
-            }
-        }
-        stage('Push to ECR') {
-            steps {
-                sh 'aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com'
-                sh "docker tag frontendapp-${app}:latest  490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${commitId}"
-                sh "docker push 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${commitId}"
-            } 
-        } 
-
-        /*stage('Deploying ECR Image to EKS') {
-            steps {
-                script {
-                    sh '''
-                        aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
-                        kubectl apply -f eks-deploy-k8s.yaml
-
-
-                    '''
-                }
-            }
-        } */
-
+    
 
     }
-
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH}"]],
+                        userRemoteConfigs: [[url: 'https://github.com/MaryPhani/bootcamp.git']]
+                    ])
+                }
+            }
+        }
+        
+        stage('Build and Test') {
+            when {
+                expression {
+                    params.BRANCH != null && params.ENVIRONMENT != null
+                }
+            }
+            steps {
+                script {
+                    if (params.BRANCH == 'main') {
+                        echo 'Building and testing for main branch'
+                        sh 'mvn clean install'
+                        // Add commands for the 'main' branch
+                    } else if (params.BRANCH == 'test') {
+                        echo 'Building and testing for test branch'
+                        sh 'mvn clean install'
+                        // Add commands for the 'test' branch
+                    }
+                    
+                    if (params.ENVIRONMENT == 'production') {
+                        echo 'Using production environment'
+                        sh 'mvn clean install'
+                        // Commands for the production environment
+                    } else if (params.ENVIRONMENT == 'testing') {
+                        echo 'Using testing environment'
+                        sh 'mvn clean install'
+                        // Commands for the testing environment
+                    }
+                }
+            }
+        }
+        
+        stage('Deployment') {
+            when {
+                expression {
+                    params.BRANCH == 'main' && params.ENVIRONMENT == 'production'
+                    cp pom.xml /root
+                }
+            }
+            steps {
+                echo 'Deploying to production'
+                cp pom.xml /
+                // Add deployment steps for the main branch and production environment
+            }
+        }
+    }
 }
