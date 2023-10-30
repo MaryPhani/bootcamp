@@ -1,10 +1,5 @@
 pipeline {
     agent any
-
-    parameters {
-    choice(choices: ['main', 'test'], description: 'Select Branch to Build', name: 'BRANCH')
-    choice(choices: ['production', 'testing'], description: 'Select Environment', name: 'ENVIRONMENT')
-
     environment {
         app = 'frontend'
         commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
@@ -19,49 +14,18 @@ pipeline {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: "origin/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'gitcred', url: 'https://github.com/MaryPhani/bootcamp.git']]])
             }
-        }
-    
-
-    }
-    
-    stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    checkout([$class: 'GitSCM',
-                        branches: [[name: "*/${params.BRANCH}"]],
-                        userRemoteConfigs: [[url: 'https://github.com/MaryPhani/bootcamp.git']]
-                    ])
-                }
-            }
-        }
-        
+        }        
         stage('Build and Test') {
-            when {
-                expression {
-                    params.BRANCH != null && params.ENVIRONMENT != null
-                }
-            }
             steps {
                 script {
-                    if (params.BRANCH == 'main') {
-                        echo 'Building and testing for main branch'
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo 'Building and testing for Dev branch'
                         sh 'mvn clean install'
-                        // Add commands for the 'main' branch
-                    } else if (params.BRANCH == 'test') {
-                        echo 'Building and testing for test branch'
+                    } else if (env.BRANCH_NAME == 'uat') {
+                        echo 'Building and testing for UAT branch'
                         sh 'mvn clean install'
-                        // Add commands for the 'test' branch
-                    }
-                    
-                    if (params.ENVIRONMENT == 'production') {
-                        echo 'Using production environment'
-                        sh 'mvn clean install'
-                        // Commands for the production environment
-                    } else if (params.ENVIRONMENT == 'testing') {
-                        echo 'Using testing environment'
-                        sh 'mvn clean install'
-                        // Commands for the testing environment
+                    } else {
+                        echo 'Skipping build for other branches'
                     }
                 }
             }
@@ -70,14 +34,19 @@ pipeline {
         stage('Deployment') {
             when {
                 expression {
-                    params.BRANCH == 'main' && params.ENVIRONMENT == 'production'
-                    cp pom.xml /root
+                    (env.BRANCH_NAME == 'dev' && currentBuild.resultIsBetterOrEqualTo('SUCCESS')) || (env.BRANCH_NAME == 'uat' && currentBuild.resultIsBetterOrEqualTo('SUCCESS'))
                 }
             }
             steps {
-                echo 'Deploying to production'
-                cp pom.xml /
-                // Add deployment steps for the main branch and production environment
+                script {
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo 'Deploying to Development environment'
+                        
+                    } else if (env.BRANCH_NAME == 'uat') {
+                        echo 'Deploying to UAT environment'
+                        
+                    }
+                }
             }
         }
     }
