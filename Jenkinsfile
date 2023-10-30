@@ -35,7 +35,7 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
-        /*stage('Compile and Run Sonar Analysis') {
+        stage('Compile and Run Sonar Analysis') {
             steps {
                 sh "mvn clean verify sonar:sonar  \
             -Dsonar.projectKey=BP-sonarqube \
@@ -43,7 +43,7 @@ pipeline {
             -Dsonar.login=sqp_684c8264f22b0aba50b8c347a0b70d2f7258805e"
             }
         } 
-      stage('Push to S3') {
+        stage('Push to S3') {
             steps {
                 sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
                 sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
@@ -63,7 +63,7 @@ pipeline {
                     failOnIssues: false
                 )
             }
-        } */
+        } 
 
  
 
@@ -79,7 +79,7 @@ pipeline {
                 sh "docker push 490167669940.dkr.ecr.ap-southeast-1.amazonaws.com/eks-frontend-app-deployment:${app}-${commitId}"
             } 
         } 
-        /*stage('Deploying ECR Image to EKS') {
+        stage('Deploying ECR Image to EKS') {
             steps {
                 script {
                     sh '''
@@ -89,6 +89,6 @@ pipeline {
                     '''
                 }
             }
-        } */
+        } 
     }
 }
